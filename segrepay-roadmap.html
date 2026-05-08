@@ -1,0 +1,1393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SegrePay — 1-Day Build Roadmap</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist+Mono:wght@300;400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:        #f5f2eb;
+  --bg2:       #ede9df;
+  --ink:       #1a1a12;
+  --ink2:      #4a4a38;
+  --ink3:      #7a7a60;
+  --green:     #2d6a4f;
+  --green-lt:  #52b788;
+  --green-bg:  #d8f3dc;
+  --amber:     #b5510a;
+  --amber-bg:  #fde8cc;
+  --blue:      #1d4e89;
+  --blue-bg:   #dbeafe;
+  --red:       #9b2226;
+  --red-bg:    #ffe4e4;
+  --rule:      rgba(26,26,18,0.12);
+  --card:      #fff9ef;
+  --shadow:    0 2px 16px rgba(26,26,18,0.08);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Outfit', sans-serif;
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+/* ── UTILITY ── */
+.mono { font-family: 'Geist Mono', monospace; }
+.serif { font-family: 'Instrument Serif', serif; }
+
+/* ── COVER ── */
+.cover {
+  background: var(--green);
+  color: #f5f2eb;
+  padding: 72px 6vw 64px;
+  position: relative;
+  overflow: hidden;
+}
+
+.cover::before {
+  content: '';
+  position: absolute;
+  top: -40px; right: -60px;
+  width: 420px; height: 420px;
+  border-radius: 50%;
+  border: 80px solid rgba(255,255,255,0.05);
+  pointer-events: none;
+}
+
+.cover::after {
+  content: '';
+  position: absolute;
+  bottom: -80px; left: 30%;
+  width: 260px; height: 260px;
+  border-radius: 50%;
+  border: 50px solid rgba(255,255,255,0.04);
+  pointer-events: none;
+}
+
+.cover-eyebrow {
+  font-family: 'Geist Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--green-lt);
+  margin-bottom: 20px;
+}
+
+.cover h1 {
+  font-family: 'Instrument Serif', serif;
+  font-size: clamp(3rem, 7vw, 6rem);
+  line-height: 1.05;
+  margin-bottom: 6px;
+}
+
+.cover h1 em {
+  font-style: italic;
+  color: var(--green-lt);
+}
+
+.cover-sub {
+  font-size: 1.05rem;
+  color: rgba(245,242,235,0.75);
+  max-width: 560px;
+  margin: 18px 0 40px;
+  line-height: 1.7;
+}
+
+.cover-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.cover-pill {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 40px;
+  padding: 6px 16px;
+  font-family: 'Geist Mono', monospace;
+  font-size: 11px;
+  color: rgba(245,242,235,0.9);
+  letter-spacing: 0.5px;
+}
+
+/* ── MAIN LAYOUT ── */
+.main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 5vw 100px;
+}
+
+/* ── SECTION TITLE ── */
+.section-title-block {
+  padding: 56px 0 24px;
+  border-bottom: 2px solid var(--ink);
+  margin-bottom: 40px;
+}
+
+.section-eyebrow {
+  font-family: 'Geist Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--ink3);
+  margin-bottom: 8px;
+}
+
+.section-title {
+  font-family: 'Instrument Serif', serif;
+  font-size: clamp(2rem, 3.5vw, 2.8rem);
+  line-height: 1.15;
+}
+
+/* ── OVERVIEW GRID ── */
+.overview-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 48px;
+}
+
+.overview-cell {
+  background: var(--card);
+  padding: 24px 20px;
+}
+
+.ov-label {
+  font-family: 'Geist Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--ink3);
+  margin-bottom: 8px;
+}
+
+.ov-value {
+  font-family: 'Instrument Serif', serif;
+  font-size: 1.6rem;
+  color: var(--green);
+  line-height: 1.2;
+}
+
+.ov-note {
+  font-size: 0.8rem;
+  color: var(--ink3);
+  margin-top: 4px;
+}
+
+/* ── ALERT BOX ── */
+.alert {
+  border-radius: 6px;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  font-size: 0.88rem;
+  line-height: 1.65;
+}
+.alert.green { background: var(--green-bg); border-left: 3px solid var(--green); color: var(--green); }
+.alert.amber  { background: var(--amber-bg); border-left: 3px solid var(--amber); color: var(--amber); }
+.alert.blue   { background: var(--blue-bg);  border-left: 3px solid var(--blue);  color: var(--blue);  }
+.alert.red    { background: var(--red-bg);   border-left: 3px solid var(--red);   color: var(--red);   }
+.alert-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+.alert-body { color: var(--ink2); }
+.alert-body strong { color: var(--ink); }
+
+/* ── TECH STACK TABLE ── */
+.tech-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 48px;
+  font-size: 0.875rem;
+}
+
+.tech-table th {
+  font-family: 'Geist Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--ink3);
+  text-align: left;
+  padding: 10px 16px;
+  border-bottom: 2px solid var(--ink);
+  background: var(--bg);
+}
+
+.tech-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--rule);
+  vertical-align: top;
+}
+
+.tech-table tr:nth-child(even) td { background: var(--bg2); }
+.tech-table tr:last-child td { border-bottom: none; }
+
+.tech-name {
+  font-family: 'Geist Mono', monospace;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--green);
+}
+
+.tech-purpose {
+  color: var(--ink2);
+  line-height: 1.55;
+}
+
+.tech-why {
+  color: var(--ink3);
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.tag-sm {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-family: 'Geist Mono', monospace;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+.tag-sm.green { background: var(--green-bg); color: var(--green); }
+.tag-sm.amber { background: var(--amber-bg); color: var(--amber); }
+.tag-sm.blue  { background: var(--blue-bg);  color: var(--blue);  }
+.tag-sm.red   { background: var(--red-bg);   color: var(--red);   }
+
+/* ── TEAM ROLES ── */
+.roles-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 48px;
+}
+
+.role-card {
+  background: var(--card);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 24px 20px;
+}
+
+.role-title {
+  font-family: 'Instrument Serif', serif;
+  font-size: 1.2rem;
+  margin-bottom: 4px;
+}
+
+.role-count {
+  font-family: 'Geist Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--ink3);
+  margin-bottom: 14px;
+}
+
+.role-tasks {
+  list-style: none;
+  font-size: 0.84rem;
+  color: var(--ink2);
+  line-height: 1.65;
+}
+
+.role-tasks li {
+  padding: 3px 0;
+  padding-left: 14px;
+  position: relative;
+}
+
+.role-tasks li::before {
+  content: '→';
+  position: absolute;
+  left: 0;
+  color: var(--green);
+  font-size: 11px;
+}
+
+/* ── TIMELINE ── */
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-bottom: 56px;
+  position: relative;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 80px;
+  top: 0; bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, var(--green), var(--green-lt), var(--amber));
+}
+
+.tl-phase {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  position: relative;
+  margin-bottom: 0;
+}
+
+.tl-time {
+  padding: 28px 20px 28px 0;
+  text-align: right;
+  position: relative;
+}
+
+.tl-time-text {
+  font-family: 'Geist Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink3);
+  letter-spacing: 0.5px;
+  line-height: 1.3;
+}
+
+.tl-dot {
+  position: absolute;
+  right: -6px;
+  top: 36px;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: var(--green);
+  border: 2px solid var(--bg);
+  z-index: 1;
+}
+
+.tl-content {
+  padding: 20px 0 20px 32px;
+  border-bottom: 1px dashed var(--rule);
+}
+
+.tl-phase:last-child .tl-content { border-bottom: none; }
+
+.tl-phase-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.phase-badge {
+  font-family: 'Geist Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 3px;
+}
+
+.pb-contract { background: var(--green-bg); color: var(--green); }
+.pb-frontend { background: var(--blue-bg);  color: var(--blue); }
+.pb-integration { background: var(--amber-bg); color: var(--amber); }
+.pb-demo { background: #f3e8ff; color: #6d28d9; }
+
+.tl-phase-title {
+  font-family: 'Instrument Serif', serif;
+  font-size: 1.25rem;
+}
+
+.tl-tasks {
+  list-style: none;
+  margin-top: 10px;
+}
+
+.tl-task {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--rule);
+  font-size: 0.87rem;
+  color: var(--ink2);
+}
+
+.tl-task:last-child { border-bottom: none; }
+
+.tl-task-who {
+  font-family: 'Geist Mono', monospace;
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 3px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.who-bc  { background: var(--green-bg); color: var(--green); }
+.who-fe  { background: var(--blue-bg);  color: var(--blue);  }
+.who-all { background: var(--bg2);      color: var(--ink3);  }
+
+.tl-task-text {
+  flex: 1;
+  line-height: 1.55;
+}
+
+.tl-task-text code {
+  font-family: 'Geist Mono', monospace;
+  font-size: 11px;
+  background: var(--bg2);
+  padding: 1px 5px;
+  border-radius: 3px;
+  color: var(--green);
+}
+
+.tl-note {
+  margin-top: 10px;
+  font-size: 0.82rem;
+  color: var(--ink3);
+  font-style: italic;
+  padding-left: 2px;
+}
+
+/* ── SMART CONTRACT ── */
+.contract-block {
+  background: #1a1a12;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 36px;
+}
+
+.contract-header {
+  background: #2d2d1f;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.contract-filename {
+  font-family: 'Geist Mono', monospace;
+  font-size: 12px;
+  color: var(--green-lt);
+}
+
+.contract-network {
+  font-family: 'Geist Mono', monospace;
+  font-size: 10px;
+  color: #888;
+  letter-spacing: 1px;
+}
+
+.contract-body {
+  padding: 24px;
+  font-family: 'Geist Mono', monospace;
+  font-size: 12.5px;
+  line-height: 1.85;
+  color: #d4d0c4;
+  white-space: pre;
+  overflow-x: auto;
+}
+
+.c-comment { color: #6a9955; }
+.c-keyword { color: #569cd6; }
+.c-type    { color: #4ec9b0; }
+.c-fn      { color: #dcdcaa; }
+.c-str     { color: #ce9178; }
+.c-num     { color: #b5cea8; }
+.c-mod     { color: #c586c0; }
+
+/* ── FEATURES TABLE ── */
+.features-list {
+  margin-bottom: 48px;
+}
+
+.feature-row {
+  display: grid;
+  grid-template-columns: 28px 1fr auto;
+  gap: 16px;
+  align-items: start;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.feature-row:last-child { border-bottom: none; }
+
+.feature-num {
+  font-family: 'Geist Mono', monospace;
+  font-size: 12px;
+  color: var(--ink3);
+  font-weight: 600;
+  padding-top: 2px;
+}
+
+.feature-body {}
+
+.feature-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 4px;
+  color: var(--ink);
+}
+
+.feature-desc {
+  font-size: 0.85rem;
+  color: var(--ink2);
+  line-height: 1.6;
+}
+
+.feature-time {
+  font-family: 'Geist Mono', monospace;
+  font-size: 10px;
+  color: var(--ink3);
+  white-space: nowrap;
+  padding-top: 3px;
+  text-align: right;
+}
+
+/* ── DEMO SCRIPT ── */
+.demo-steps {
+  counter-reset: demo;
+  list-style: none;
+  margin-bottom: 48px;
+}
+
+.demo-step {
+  display: flex;
+  gap: 20px;
+  padding: 20px 0;
+  border-bottom: 1px dashed var(--rule);
+}
+
+.demo-step:last-child { border-bottom: none; }
+
+.demo-step-num {
+  font-family: 'Instrument Serif', serif;
+  font-size: 2.5rem;
+  color: var(--bg2);
+  line-height: 1;
+  flex-shrink: 0;
+  width: 48px;
+  text-align: center;
+  padding-top: 2px;
+  -webkit-text-stroke: 1.5px var(--green);
+  color: transparent;
+}
+
+.demo-step-body {}
+
+.demo-step-title {
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 4px;
+}
+
+.demo-step-desc {
+  font-size: 0.85rem;
+  color: var(--ink2);
+  line-height: 1.65;
+}
+
+.demo-step-desc code {
+  font-family: 'Geist Mono', monospace;
+  font-size: 11px;
+  background: var(--bg2);
+  padding: 1px 5px;
+  border-radius: 3px;
+  color: var(--green);
+}
+
+/* ── RISK TABLE ── */
+.risk-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  margin-bottom: 48px;
+}
+
+.risk-table th {
+  font-family: 'Geist Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--ink3);
+  text-align: left;
+  padding: 10px 14px;
+  border-bottom: 2px solid var(--ink);
+}
+
+.risk-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--rule);
+  vertical-align: top;
+  color: var(--ink2);
+  line-height: 1.55;
+}
+
+.risk-table tr:last-child td { border-bottom: none; }
+
+/* ── FOOTER ── */
+.doc-footer {
+  background: var(--ink);
+  color: rgba(245,242,235,0.6);
+  padding: 40px 6vw;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.footer-brand {
+  font-family: 'Instrument Serif', serif;
+  font-size: 1.3rem;
+  color: var(--green-lt);
+}
+
+.footer-mono {
+  font-family: 'Geist Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1px;
+}
+
+@media (max-width: 768px) {
+  .overview-grid { grid-template-columns: 1fr 1fr; }
+  .roles-grid    { grid-template-columns: 1fr; }
+  .timeline::before { left: 64px; }
+  .tl-time { padding-left: 0; }
+  .feature-row { grid-template-columns: 24px 1fr; }
+  .feature-time { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══ COVER ══ -->
+<div class="cover">
+  <p class="cover-eyebrow">// TECHFEST Hackathon · Olongapo City · Build Document</p>
+  <h1><em>SegrePay</em><br>1-Day Roadmap</h1>
+  <p class="cover-sub">A complete hour-by-hour execution plan for building the Tokenized Waste Segregation Rewards system on Avalanche — focused strictly on what ships in a single hackathon day.</p>
+  <div class="cover-pills">
+    <span class="cover-pill">⏱ 10–12 Hour Build Window</span>
+    <span class="cover-pill">🔗 Avalanche Fuji Testnet</span>
+    <span class="cover-pill">⚛️ React + Solidity</span>
+    <span class="cover-pill">👥 3–4 Person Team</span>
+    <span class="cover-pill">🎯 4 Core MVP Features</span>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- ══ OVERVIEW STATS ══ -->
+  <div class="section-title-block">
+    <p class="section-eyebrow">// 00 · Overview</p>
+    <h2 class="section-title">What We're Building & How Long It Takes</h2>
+  </div>
+
+  <div class="overview-grid">
+    <div class="overview-cell">
+      <p class="ov-label">Total Build Time</p>
+      <p class="ov-value">~11 hrs</p>
+      <p class="ov-note">8h build + 2h polish + 1h demo prep</p>
+    </div>
+    <div class="overview-cell">
+      <p class="ov-label">Core Features</p>
+      <p class="ov-value">4 only</p>
+      <p class="ov-note">Token · Deposit · Balance · Leaderboard</p>
+    </div>
+    <div class="overview-cell">
+      <p class="ov-label">Smart Contracts</p>
+      <p class="ov-value">2 files</p>
+      <p class="ov-note">SegreToken.sol + SegRewards.sol</p>
+    </div>
+    <div class="overview-cell">
+      <p class="ov-label">Network</p>
+      <p class="ov-value">Fuji</p>
+      <p class="ov-note">Avalanche C-Chain Testnet (free AVAX)</p>
+    </div>
+  </div>
+
+  <div class="alert green">
+    <span class="alert-icon">💡</span>
+    <div class="alert-body"><strong>Strategy:</strong> Build the smart contract first and get it deployed in the first 2 hours. Everything else (frontend, QR, leaderboard) is just a UI on top of a working contract. If the contract is live and callable, your demo works even if the UI is rough.</div>
+  </div>
+
+  <div class="alert amber">
+    <span class="alert-icon">⚠️</span>
+    <div class="alert-body"><strong>What we're cutting:</strong> No real IoT QR scanning, no token redemption marketplace, no barangay admin authentication. Those are V2. For the demo, we simulate the EcoVerifier role from a second MetaMask wallet and generate QR codes statically. Judges care about the blockchain working — not the UI being pixel-perfect.</div>
+  </div>
+
+  <!-- ══ TEAM ROLES ══ -->
+  <div class="section-title-block">
+    <p class="section-eyebrow">// 01 · Team Setup</p>
+    <h2 class="section-title">Who Does What</h2>
+  </div>
+
+  <div class="alert blue">
+    <span class="alert-icon">👥</span>
+    <div class="alert-body"><strong>Ideal team: 3–4 people.</strong> Split into two tracks that run in parallel from Hour 2 onward — Blockchain Track and Frontend Track. They only merge at Hour 7 during integration. This is how you hit 11 hours without crunch-killing yourself.</div>
+  </div>
+
+  <div class="roles-grid">
+    <div class="role-card" style="border-top: 3px solid var(--green);">
+      <p class="role-title">Blockchain Dev</p>
+      <p class="role-count">1–2 people · <span class="tag-sm green">BC Track</span></p>
+      <ul class="role-tasks">
+        <li>Write SegreToken.sol (ERC-20)</li>
+        <li>Write SegRewards.sol (deposit + reward logic)</li>
+        <li>Deploy both contracts on Fuji testnet via Remix or Hardhat</li>
+        <li>Copy & share contract ABI + addresses to frontend team</li>
+        <li>Write contract interaction scripts for demo fallback</li>
+        <li>Test all contract functions end-to-end</li>
+      </ul>
+    </div>
+    <div class="role-card" style="border-top: 3px solid var(--blue);">
+      <p class="role-title">Frontend Dev</p>
+      <p class="role-count">1–2 people · <span class="tag-sm blue">FE Track</span></p>
+      <ul class="role-tasks">
+        <li>Scaffold React + Vite project</li>
+        <li>Implement MetaMask / Core Wallet connection</li>
+        <li>Build Verifier deposit form (UI only, then hook to contract)</li>
+        <li>Build Citizen dashboard (token balance display)</li>
+        <li>Build barangay leaderboard from contract events</li>
+        <li>Generate static QR codes for demo households</li>
+      </ul>
+    </div>
+    <div class="role-card" style="border-top: 3px solid var(--amber);">
+      <p class="role-title">Project Lead / Presenter</p>
+      <p class="role-count">1 person · <span class="tag-sm amber">ALL</span></p>
+      <ul class="role-tasks">
+        <li>Manage timeline and keep both tracks unblocked</li>
+        <li>Document the problem-solution narrative</li>
+        <li>Prepare presentation slides (5-min format)</li>
+        <li>Write the demo script and rehearse it</li>
+        <li>Handle testnet AVAX faucet top-ups</li>
+        <li>QA test the full user flow before judging</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ══ CORE FEATURES ══ -->
+  <div class="section-title-block">
+    <p class="section-eyebrow">// 02 · Core Features</p>
+    <h2 class="section-title">The 4 Things We Ship. Nothing Else.</h2>
+  </div>
+
+  <div class="alert red">
+    <span class="alert-icon">🚫</span>
+    <div class="alert-body"><strong>Scope discipline is everything in a hackathon.</strong> Every feature below is load-bearing for the demo. If it's not in this list, it does not get built today. No exceptions.</div>
+  </div>
+
+  <div class="features-list">
+    <div class="feature-row">
+      <div class="feature-num">01</div>
+      <div class="feature-body">
+        <p class="feature-name">ECO Token on Avalanche (ERC-20)</p>
+        <p class="feature-desc">A mintable ERC-20 token deployed on Avalanche Fuji Testnet. The SegRewards contract is the only authorized minter. This is the core economic primitive — every reward flows through it. No token = no demo. This must be deployed and verified in the first 90 minutes.</p>
+      </div>
+      <div class="feature-time">Hrs 0–1.5<br><span class="tag-sm green">BC</span></div>
+    </div>
+    <div class="feature-row">
+      <div class="feature-num">02</div>
+      <div class="feature-body">
+        <p class="feature-name">EcoVerifier Deposit Panel</p>
+        <p class="feature-desc">A simple form — barangay selector, waste category (biodegradable / recyclable / residual), weight in kg, and citizen wallet address — that a designated EcoVerifier wallet submits to the <code>rewardDeposit()</code> contract function. On success, ECO tokens are minted to the citizen's address. This is the core value transaction of the entire system.</p>
+      </div>
+      <div class="feature-time">Hrs 2–5<br><span class="tag-sm blue">FE</span></div>
+    </div>
+    <div class="feature-row">
+      <div class="feature-num">03</div>
+      <div class="feature-body">
+        <p class="feature-name">Citizen Wallet Dashboard</p>
+        <p class="feature-desc">A wallet-connected view that shows: (a) the connected address, (b) current ECO token balance fetched live from the contract, and (c) a transaction history of deposits received. No redemption flow needed today — just proof that tokens land in the right wallet and the balance updates in real time after a deposit.</p>
+      </div>
+      <div class="feature-time">Hrs 3–5<br><span class="tag-sm blue">FE</span></div>
+    </div>
+    <div class="feature-row">
+      <div class="feature-num">04</div>
+      <div class="feature-body">
+        <p class="feature-name">Live Barangay Leaderboard</p>
+        <p class="feature-desc">A ranked table of barangay names and their cumulative ECO tokens earned, pulled from on-chain <code>DepositLogged</code> events. Refreshes every 15 seconds or on each new deposit. This is the visual money shot for judges — they can see Barangay 1 climbing the leaderboard in real time as you demo a deposit. Pre-load 3 demo barangays with simulated on-chain history before the presentation.</p>
+      </div>
+      <div class="feature-time">Hrs 5–7<br><span class="tag-sm blue">FE</span></div>
+    </div>
+  </div>
+
+  <!-- ══ TECH STACK ══ -->
+  <div class="section-title-block">
+    <p class="section-eyebrow">// 03 · Tech Stack</p>
+    <h2 class="section-title">Every Tool, Why We're Using It</h2>
+  </div>
+
+  <table class="tech-table">
+    <thead>
+      <tr>
+        <th style="width:160px;">Tool / Library</th>
+        <th style="width:80px;">Layer</th>
+        <th>What It Does in SegrePay</th>
+        <th>Why Not Something Else</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="tech-name">Solidity 0.8.x</span></td>
+        <td><span class="tag-sm green">BC</span></td>
+        <td class="tech-purpose">Smart contract language. Writes both <code style="font-family:'Geist Mono',monospace;font-size:11px;">SegreToken.sol</code> and <code style="font-family:'Geist Mono',monospace;font-size:11px;">SegRewards.sol</code>.</td>
+        <td class="tech-why">Avalanche C-Chain is EVM-compatible. Solidity is the only practical choice for a hackathon timebox.</td>
+      </tr>
+      <tr>
+        <td><span class="tech-name">Remix IDE</span></td>
+        <td><span class="tag-sm green">BC</span></td>
+        <td class="tech-purpose">Browser-based Solidity IDE. Write, compile, and deploy directly to Fuji testnet without any local setup.</td>
+        <td class="tech-why">Zero setup time. Hardhat is more powerful but takes 30–45 min to configure. We don't have that time.</td>
+      </tr>
+      <tr>
+        <td><span class="tech-name">OpenZeppelin Contracts</span></td>
+        <td><span class="tag-sm green">BC</span></td>
+        <td class="tech-purpose">Use <code style="font-family:'Geist Mono',monospace;font-size:11px;">ERC20.sol</code> and <code style="font-family:'Geist Mono',monospace;font-size:11px;">Ownable.sol</code> as base classes. Don't write ERC-20 from scratch.</td>
+        <td class="tech-why">Battle-tested, audited code. Using it means 90% of the token contract is already written — just inherit and extend.</td>
+      </tr>
+      <tr>
+        <td><span class="tech-name">Avalanche Fuji Testnet</span></td>
+        <td><span class="tag-sm green">BC</span></td>
+        <td class="tech-purpose">Free testnet environment. Deploy contracts, call functions, and show real blockchain transactions — no real money needed.</td>
+        <td class="tech-why">Avalanche C-Chain is required by the hackathon. Fuji is its official testnet. AVAX faucet gives free test tokens in seconds.</td>
+      </tr>
+      <tr>
+        <td><span class="tech-name">Core Wallet / MetaMask</span></td>
+        <td><span class="tag-sm green">BC</span></td>
+        <td class="tech-purpose">Browser wallet for signing transactions. Use <strong>Core Wallet</strong> (native Avalanche) for judging demo; MetaMask as fallback.</td>
+        <td class="tech-why">Core Wallet is built by Ava Labs — using it signals you know the Avalanche ecosystem. Bonus impression points with judges.</td>
+      </tr>
+      <tr>
+        <td><span class="tech-name">React + Vite</span></td>
+        <td><span class="tag-sm blue">FE</span></td>
+        <td class="tech-purpose">Frontend framework and dev server. Fast HMR, instant scaffolding with <code style="font-family:'Geist Mono',monospace;font-size:11px;">npm create vite@latest</code>.</td>
+        <td class="tech-why">Fastest setup for a React project. Zero config. The entire team likely knows it already.</td>
+      </tr>
+      <tr>
+        <td><span class="tech-name">Ethers.js v6</span></td>
+        <td><span class="tag-sm blue">FE</span></td>
+        <td class="tech-purpose">Connects the React frontend to the Avalanche contracts. Handles wallet connection, contract calls, and event listening.</td>
+        <td class="tech-why">Industry standard for EVM frontends. Web3.js is heavier. Ethers.js has cleaner async API and better error messages.</td>
+      </tr>
+      <tr>
+        <td><span class="tech-name">Tailwind CSS</span></td>
+        <td><span class="tag-sm blue">FE</span></td>
+        <td class="tech-purpose">Utility-first CSS. Style the deposit form, dashboard, and leaderboard without writing a single CSS file.</td>
+        <td class="tech-why">Fastest way to get a presentable UI in a hackathon. No naming classes, no context switching.</td>
+      </tr>
+      <tr>
+        <td><span class="tech-name">qrcode.react</span></td>
+        <td><span class="tag-sm blue">FE</span></td>
+        <td class="tech-purpose">Generate printable QR codes from wallet addresses. In the demo, each "household" has a QR that encodes their AVAX wallet address.</td>
+        <td class="tech-why">One-line install (<code style="font-family:'Geist Mono',monospace;font-size:11px;">npm i qrcode.react</code>), zero config, renders as SVG. 10 minutes to implement.</td>
+      </tr>
+      <tr>
+        <td><span class="tech-name">Recharts</span></td>
+        <td><span class="tag-sm blue">FE</span></td>
+        <td class="tech-purpose">Render the barangay leaderboard as a live bar chart in addition to the table. Judges love a chart that moves.</td>
+        <td class="tech-why">React-native charting, 5-minute integration, no D3 complexity. Pre-built bar chart component works out of the box.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ══ SMART CONTRACT ══ -->
+  <div class="section-title-block">
+    <p class="section-eyebrow">// 04 · Smart Contracts</p>
+    <h2 class="section-title">The Exact Code to Write</h2>
+  </div>
+
+  <div class="alert green">
+    <span class="alert-icon">📋</span>
+    <div class="alert-body"><strong>Copy this into Remix and deploy.</strong> These are complete, production-ready contracts for the MVP. The blockchain dev should be able to have both deployed within 90 minutes of the hackathon starting — including testnet AVAX faucet setup.</div>
+  </div>
+
+  <div class="contract-block">
+    <div class="contract-header">
+      <span class="contract-filename">SegreToken.sol</span>
+      <span class="contract-network">Avalanche Fuji C-Chain · Solidity ^0.8.20</span>
+    </div>
+    <div class="contract-body"><span class="c-comment">// SPDX-License-Identifier: MIT</span>
+<span class="c-keyword">pragma</span> solidity ^0.8.20;
+
+<span class="c-keyword">import</span> <span class="c-str">"@openzeppelin/contracts/token/ERC20/ERC20.sol"</span>;
+<span class="c-keyword">import</span> <span class="c-str">"@openzeppelin/contracts/access/Ownable.sol"</span>;
+
+<span class="c-comment">/**
+ * @title  SegreToken
+ * @notice The SegrePay  reward token. Only the SegRewards contract
+ *         (set as owner after deployment) can mint new tokens.
+ */</span>
+<span class="c-keyword">contract</span> <span class="c-type">SegreToken</span> <span class="c-keyword">is</span> <span class="c-type">ERC20</span>, <span class="c-type">Ownable</span> {
+
+    <span class="c-keyword">constructor</span>()
+        <span class="c-type">ERC20</span>(<span class="c-str">"SegrePay  Token"</span>, <span class="c-str">"ECO"</span>)
+        <span class="c-type">Ownable</span>(msg.sender)
+    {}
+
+    <span class="c-comment">/// @dev Called by SegRewards contract only</span>
+    <span class="c-keyword">function</span> <span class="c-fn">mint</span>(<span class="c-type">address</span> to, <span class="c-type">uint256</span> amount)
+        <span class="c-keyword">external</span>
+        <span class="c-fn">onlyOwner</span>
+    {
+        _mint(to, amount);
+    }
+}</div>
+  </div>
+
+  <div class="contract-block">
+    <div class="contract-header">
+      <span class="contract-filename">SegRewards.sol</span>
+      <span class="contract-network">Avalanche Fuji C-Chain · Solidity ^0.8.20</span>
+    </div>
+    <div class="contract-body"><span class="c-comment">// SPDX-License-Identifier: MIT</span>
+<span class="c-keyword">pragma</span> solidity ^0.8.20;
+
+<span class="c-keyword">import</span> <span class="c-str">"@openzeppelin/contracts/access/Ownable.sol"</span>;
+<span class="c-keyword">import</span> <span class="c-str">"./SegreToken.sol"</span>;
+
+<span class="c-comment">/**
+ * @title  SegRewards
+ * @notice Core logic for SegrePay.
+ *         Verifiers submit waste deposits → citizens earn ECO tokens.
+ *         All deposits are permanently logged on-chain.
+ */</span>
+<span class="c-keyword">contract</span> <span class="c-type">SegRewards</span> <span class="c-keyword">is</span> <span class="c-type">Ownable</span> {
+
+    <span class="c-type">SegreToken</span> <span class="c-keyword">public</span> segreToken;
+
+    <span class="c-comment">// Tokens minted per kilogram of waste deposited</span>
+    <span class="c-type">uint256</span> <span class="c-keyword">public</span> tokensPerKg = <span class="c-num">10</span> * <span class="c-num">1e18</span>; <span class="c-comment">// 10 ECO per kg</span>
+
+    <span class="c-comment">// Approved verifier wallets (barangay MRF operators)</span>
+    <span class="c-keyword">mapping</span>(<span class="c-type">address</span> => <span class="c-type">bool</span>) <span class="c-keyword">public</span> isVerifier;
+
+    <span class="c-comment">// Track each barangay's total ECO minted (1–17 for Olongapo)</span>
+    <span class="c-keyword">mapping</span>(<span class="c-type">uint8</span> => <span class="c-type">uint256</span>) <span class="c-keyword">public</span> barangayTotal;
+
+    <span class="c-comment">// Track each citizen's cumulative kg deposited</span>
+    <span class="c-keyword">mapping</span>(<span class="c-type">address</span> => <span class="c-type">uint256</span>) <span class="c-keyword">public</span> totalKgDeposited;
+
+    <span class="c-comment">// ── Events (queried by frontend for leaderboard) ──</span>
+    <span class="c-keyword">event</span> <span class="c-fn">DepositLogged</span>(
+        <span class="c-type">address</span> <span class="c-keyword">indexed</span> citizen,
+        <span class="c-type">uint8</span>   barangayId,
+        <span class="c-type">string</span>  wasteCategory,   <span class="c-comment">// "biodegradable" | "recyclable" | "residual"</span>
+        <span class="c-type">uint256</span> kg,
+        <span class="c-type">uint256</span> ecoMinted,
+        <span class="c-type">uint256</span> timestamp
+    );
+
+    <span class="c-keyword">event</span> <span class="c-fn">VerifierUpdated</span>(<span class="c-type">address</span> verifier, <span class="c-type">bool</span> status);
+
+    <span class="c-comment">// ── Constructor ──</span>
+    <span class="c-keyword">constructor</span>(<span class="c-type">address</span> _segreToken) <span class="c-type">Ownable</span>(msg.sender) {
+        segreToken = <span class="c-type">SegreToken</span>(_segreToken);
+    }
+
+    <span class="c-comment">// ── Admin: add/remove verifier wallets ──</span>
+    <span class="c-keyword">function</span> <span class="c-fn">setVerifier</span>(<span class="c-type">address</span> v, <span class="c-type">bool</span> status)
+        <span class="c-keyword">external</span> <span class="c-fn">onlyOwner</span>
+    {
+        isVerifier[v] = status;
+        <span class="c-keyword">emit</span> <span class="c-fn">VerifierUpdated</span>(v, status);
+    }
+
+    <span class="c-comment">// ── Admin: adjust reward rate ──</span>
+    <span class="c-keyword">function</span> <span class="c-fn">setTokensPerKg</span>(<span class="c-type">uint256</span> amount)
+        <span class="c-keyword">external</span> <span class="c-fn">onlyOwner</span>
+    {
+        tokensPerKg = amount;
+    }
+
+    <span class="c-comment">/**
+     * @notice Verifier calls this after physically confirming a
+     *         citizen's waste deposit at the MRF.
+     * @param  citizen       Wallet address of the depositing household
+     * @param  barangayId    Barangay number (1–17)
+     * @param  wasteCategory Type of waste segregated
+     * @param  kg            Weight of deposit in kilograms
+     */</span>
+    <span class="c-keyword">function</span> <span class="c-fn">rewardDeposit</span>(
+        <span class="c-type">address</span> citizen,
+        <span class="c-type">uint8</span>   barangayId,
+        <span class="c-type">string</span> <span class="c-keyword">calldata</span> wasteCategory,
+        <span class="c-type">uint256</span> kg
+    ) <span class="c-keyword">external</span> {
+        <span class="c-fn">require</span>(isVerifier[msg.sender], <span class="c-str">"Not an authorized verifier"</span>);
+        <span class="c-fn">require</span>(kg > <span class="c-num">0</span>,               <span class="c-str">"Weight must be > 0 kg"</span>);
+        <span class="c-fn">require</span>(citizen != <span class="c-type">address</span>(<span class="c-num">0</span>), <span class="c-str">"Invalid citizen address"</span>);
+
+        <span class="c-type">uint256</span> reward = kg * tokensPerKg;
+
+        <span class="c-comment">// Update state</span>
+        barangayTotal[barangayId]    += reward;
+        totalKgDeposited[citizen]    += kg;
+
+        <span class="c-comment">// Mint tokens directly to citizen wallet</span>
+        segreToken.<span class="c-fn">mint</span>(citizen, reward);
+
+        <span class="c-keyword">emit</span> <span class="c-fn">DepositLogged</span>(
+            citizen,
+            barangayId,
+            wasteCategory,
+            kg,
+            reward,
+            block.timestamp
+        );
+    }
+
+    <span class="c-comment">/// @notice Read barangay totals for the leaderboard</span>
+    <span class="c-keyword">function</span> <span class="c-fn">getBarangayTotals</span>(<span class="c-type">uint8</span>[] <span class="c-keyword">calldata</span> ids)
+        <span class="c-keyword">external</span> <span class="c-keyword">view</span>
+        <span class="c-keyword">returns</span> (<span class="c-type">uint256</span>[] <span class="c-keyword">memory</span> totals)
+    {
+        totals = <span class="c-keyword">new</span> <span class="c-type">uint256</span>[](ids.length);
+        <span class="c-keyword">for</span> (<span class="c-type">uint</span> i = <span class="c-num">0</span>; i < ids.length; i++) {
+            totals[i] = barangayTotal[ids[i]];
+        }
+    }
+}</div>
+  </div>
+
+  <div class="alert blue">
+    <span class="alert-icon">🚀</span>
+    <div class="alert-body"><strong>Deployment order:</strong> (1) Deploy <code style="font-family:'Geist Mono',monospace;font-size:11px;">SegreToken.sol</code> → copy the deployed address. (2) Deploy <code style="font-family:'Geist Mono',monospace;font-size:11px;">SegRewards.sol</code> passing the SegreToken address as constructor argument. (3) Call <code style="font-family:'Geist Mono',monospace;font-size:11px;">SegreToken.transferOwnership(SegRewards_address)</code> so the rewards contract can mint. (4) Call <code style="font-family:'Geist Mono',monospace;font-size:11px;">SegRewards.setVerifier(yourWallet, true)</code> to authorize the demo verifier wallet.</div>
+  </div>
+
+  <!-- ══ TIMELINE ══ -->
+  <div class="section-title-block">
+    <p class="section-eyebrow">// 05 · Hour-by-Hour Timeline</p>
+    <h2 class="section-title">The Full Day, Mapped Out</h2>
+  </div>
+
+  <div class="alert amber">
+    <span class="alert-icon">⏱</span>
+    <div class="alert-body"><strong>Time check rule:</strong> At the end of every phase, the team lead does a 5-minute sync. If any track is more than 45 minutes behind, immediately cut scope — never push demo prep past the 10-hour mark.</div>
+  </div>
+
+  <div class="timeline">
+
+    <!-- PHASE 0 -->
+    <div class="tl-phase">
+      <div class="tl-time">
+        <div class="tl-time-text">Hour<br>0 – 0:30</div>
+        <div class="tl-dot" style="background:#888;"></div>
+      </div>
+      <div class="tl-content">
+        <div class="tl-phase-label">
+          <span class="phase-badge pb-contract">⚙️ Setup</span>
+          <span class="tl-phase-title">Pre-Flight Check — Everyone Together</span>
+        </div>
+        <ul class="tl-tasks">
+          <li class="tl-task">
+            <span class="tl-task-who who-all">ALL</span>
+            <span class="tl-task-text">Install Core Wallet browser extension on the demo laptop. Add Avalanche Fuji Testnet manually (Chain ID: 43113, RPC: <code>https://api.avax-test.network/ext/bc/C/rpc</code>). Go to <code>faucet.avax.network</code> and claim 2 AVAX for each wallet you need (admin, verifier, 3 citizen demo wallets).</span>
+          </li>
+          <li class="tl-task">
+            <span class="tl-task-who who-all">ALL</span>
+            <span class="tl-task-text">Open Remix IDE in the browser (<code>remix.ethereum.org</code>). Create two files: <code>SegreToken.sol</code> and <code>SegRewards.sol</code>. Paste the contract code in. Connect Remix to Core Wallet on Fuji.</span>
+          </li>
+          <li class="tl-task">
+            <span class="tl-task-who who-fe">FE</span>
+            <span class="tl-task-text">Run <code>npm create vite@latest SegrePay -- --template react</code> then <code>npm install ethers qrcode.react recharts tailwindcss</code> and initialize Tailwind. Make sure the dev server runs at <code>localhost:5173</code>.</span>
+          </li>
+        </ul>
+        <p class="tl-note">Goal: Everyone has working wallets with testnet AVAX, Remix is open with contracts pasted, and the React project runs. Don't move on until this is done.</p>
+      </div>
+    </div>
+
+    <!-- PHASE 1 -->
+    <div class="tl-phase">
+      <div class="tl-time">
+        <div class="tl-time-text">Hour<br>0:30 – 2</div>
+        <div class="tl-dot"></div>
+      </div>
+      <div class="tl-content">
+        <div class="tl-phase-label">
+          <span class="phase-badge pb-contract">🔗 Blockchain</span>
+          <span class="tl-phase-title">Deploy Both Contracts to Fuji Testnet</span>
+        </div>
+        <ul class="tl-tasks">
+          <li class="tl-task">
+            <span class="tl-task-who who-bc">BC</span>
+            <span class="tl-task-text">In Remix, compile <code>SegreToken.sol</code> (compiler: 0.8.20, optimization: ON). Switch environment to "Injected Provider — Core Wallet". Deploy SegreToken. Copy the deployed contract address immediately and save it somewhere safe.</span>
+          </li>
+          <li class="tl-task">
+            <span class="tl-task-who who-bc">BC</span>
+            <span class="tl-task-text">Compile and deploy <code>SegRewards.sol</code>, passing the SegreToken address as the constructor argument. After deployment, call <code>SegreToken.transferOwnership(SegRewards_address)</code> to hand minting authority to the rewards contract.</span>
+          </li>
+          <li class="tl-task">
+            <span class="tl-task-who who-bc">BC</span>
+            <span class="tl-task-text">In the SegRewards contract on Remix, call <code>setVerifier(your_demo_verifier_wallet, true)</code>. Then call <code>rewardDeposit(citizen_address, 1, "recyclable", 2)</code> as a smoke test. Check the citizen wallet's ECO balance — should show 20 ECO (2 kg × 10 ECO/kg). If this works, the contract is live.</span>
+          </li>
+          <li class="tl-task">
+            <span class="tl-task-who who-bc">BC</span>
+            <span class="tl-task-text">Share both contract addresses and their ABIs (copy from Remix "Compilation Details" panel) in the team chat. The FE track needs these immediately.</span>
+          </li>
+        </ul>
+        <p class="tl-note">🎯 Exit criteria: Both contracts deployed, smoke test passes, addresses + ABIs shared to FE. Verify on <code>testnet.snowtrace.io</code> — paste the contract address and confirm it shows the DepositLogged event from the smoke test.</p>
+      </div>
+    </div>
+
+    <!-- PHASE 2 -->
+    <div class="tl-phase">
+      <div class="tl-time">
+        <div class="tl-time-text">Hour<br>2 – 4</div>
+        <div class="tl-dot" style="background:var(--blue);"></div>
+      </div>
+      <div class="tl-content">
+        <div class="tl-phase-label">
+          <span class="phase-badge pb-frontend">⚛️ Frontend</span>
+          <span class="tl-phase-title">Wallet Connection + Verifier Deposit Form</span>
+        </div>
+        <ul class="tl-tasks">
+          <li class="tl-task">
+            <span class="tl-task-who who-fe">FE</span>
+            <span class="tl-task-text">Create <code>src/hooks/useWallet.js</code>. Use <code>ethers.BrowserProvider(window.ethereum)</code> to connect Core Wallet. Expose <code>{ address, signer, provider, connect }</code>. Test by showing the connected wallet address on screen.</span>
+          </li>
+          <li class="tl-task">
+            <span class="tl-task-who who-fe">FE</span>
+            <span class="tl-task-text">Create <code>src/contracts/index.js</code>. Export two contract instances initialized with Ethers: <code>getSegreToken(signer)</code> and <code>getSegRewards(signer)</code> using the ABIs and deployed addresses shared by the BC team. This is the single source of truth for all contract calls.</span>
+          </li>
+          <li class="tl-task">
+            <span class="tl-task-who who-fe">FE</span>
+            <span class="tl-task-text">Build the <code>VerifierPanel</code> component. It's a simple form: dropdown for barangay (Barangay 1–3 for demo), dropdown for waste category, number input for kg, text input for citizen wallet address. On submit, call <code>segRewards.rewardDeposit(citizen, barangayId, category, kg)</code> with the connected verifier wallet and <code>await tx.wait()</code>. Show a success message with the transaction hash.</span>
+          </li>
+          <li class="tl-task">
+            <span class="tl-task-who who-fe">FE</span>
+            <span class="tl-task-text">Add loading state and error handling to the form. If the wallet isn't a verifier, the contract will revert — catch this and show "Wallet not authorized as verifier" to the user instead of a raw error.</span>
+          </li>
+        </ul>
+        <p class="tl-note">🎯 Exit criteria: Connect wallet button works. Verifier form submits a transaction, waits for confirmation, and shows a success state with a Snowtrace link. The BC team should verify the DepositLogged event appeared on-chain.</p>
+      </div>
+    </div>
+
+    <!-- PHASE 3 -->
+    <div class="tl-phase">
+      <div class="tl-time">
+        <div class="tl-time-text">Hour<br>4 – 6</div>
+        <div class="tl-dot" style="background:var(--blue);"></div>
+      </div>
+      <div class="tl-content">
+        <div class="tl-phase-label">
+          <span class="phase-badge pb-frontend">⚛️ Frontend</span>
+          <span class="tl-phase-title">Citizen Dashboard + Leaderboard</span>
+        </div>
+        <ul class="tl-tasks">
+          <li class="tl-task">
+            <span class="tl-task-who who-fe">FE</span>
+            <span class="tl-task-text">Build the <code>CitizenDashboard</code> component. Read the ECO token balance with <code>segreToken.balanceOf(address)</code> and display it formatted (divide by 1e18). Set up a 15-second polling interval using <code>useEffect</code> so the balance auto-refreshes after a deposit. Also display the wallet address and total kg deposited from <code>segRewards.totalKgDeposited(address)</code>.</span>
+          </li>
+          <li class="tl-task">
+            <span class="tl-task-who who-fe">FE</span>
+            <span class="tl-task-text">Build the <code>Leaderboard</code> component. Call <code>segRewards.getBarangayTotals([1,2,3])</code> to get the 3 demo barangay totals. Render as a ranked table (name, ECO total, rank medal). Use Recharts <code>BarChart</code> to also show these as a horizontal bar chart with green bars. Refresh every 15 seconds.</span>
+          </li>
+          <li class="tl-task">
+            <span class="tl-task-who who-fe">FE</span>
+            <span class="tl-task-text">Add a QR code section using <code>qrcode.react</code>. For the demo, generate 3 static QR codes hardcoded to the 3 pre-funded citizen wallet addresses. Label them "Household A / Barangay 1", etc. This represents how a real deployment would assign QR-linked eco-bags to households.</span>
+          </li>
+          <li class="tl-task">
+            <span class="tl-task-who who-bc">BC</span>
+            <span class="tl-task-text">While FE works on the dashboard, seed the demo state: call <code>rewardDeposit</code> 5–6 times across the 3 demo barangays and 3 citizen wallets with varying kg values. This pre-populates the leaderboard with real on-chain history so it doesn't look empty during the demo.</span>
+          </li>
+        </ul>
+        <p class="tl-note">🎯 Exit criteria: Citizen dashboard shows live ECO balance. Leaderboard shows 3 barangays with real on-chain data. QR codes display and look clean. The full flow — deposit via Verifier Panel → Citizen Dashboard balance updates → Leaderboard ranking changes — works end-to-end.</p>
+      </div>
+    </div>
+
+    <!-- PHASE 4 -->
+    <div class="tl-phase">
+      <div class="tl-time">
+        <div class="tl-time-text">Hour<br>6 – 8</div>
+        <div class="tl-dot" style="background:#888;"></div>
+      </div>
+      <div class="tl-content">
+        <div class="tl-phase-label">
+          <span class="phase-badge pb-integration">🔌 Integration</span>
+          <span class="tl-phase-title">Assembly, Layout & Bug Fixes</span>
+        </div>
+        <ul class="tl-tasks">
+          <li class="tl-task">
+            <span class="tl-task-who who-all">ALL</span>
+            <span class="tl-task-text">Assemble the full app layout. Suggested page structure: top navbar with SegrePay logo + connected wallet address. Two-tab view: Tab 1 = "Verifier Panel" (the deposit form), Tab 2 = "Citizen View" (dashboard + leaderboard). QR codes shown in a side panel or modal.</span>
+          </li>
+          <li class="tl-task">
+            <span class="tl-task-who who-all">ALL</span>
+            <span class="tl-task-text">Run the full demo flow 3 times in a row from scratch: connect wallet → switch to verifier wallet → submit deposit → watch citizen balance update → watch leaderboard reorder. Fix any bugs found. Each full run should take under 2 minutes.</span>
+          </li>
+          <li class="tl-task">
+            <span class="tl-task-who who-fe">FE</span>
+            <span class="tl-task-text">Add a "Recent Transactions" feed component. Query the SegRewards contract for <code>DepositLogged</code> events from the last 50 blocks using <code>provider.queryFilter()</code>. Display as a scrolling list: "Household [address] deposited Xkg of recyclables — earned Y ECO [time ago]". This shows judges the live blockchain feed.</span>
+          </li>
+          <li class="tl-task">
+            <span class="tl-task-who who-all">ALL</span>
+            <span class="tl-task-text">Polish visual pass: make sure fonts are readable, buttons have hover states, the leaderboard rankings are clearly numbered, and the Snowtrace transaction link opens correctly. It doesn't need to be beautiful — it needs to be legible and functional during a 5-minute presentation.</span>
+          </li>
+        </ul>
+        <p class="tl-note">🎯 Exit criteria: One clean full-demo run with zero bugs, zero console errors visible on screen. The Snowtrace link for the last transaction opens and shows the DepositLogged event correctly decoded.</p>
+      </div>
+    </div>
+
+    <!-- PHASE 5 -->
+    <div class="tl-phase">
+      <div class="tl-time">
+        <div class="tl-time-text">Hour<br>8 – 10</div>
+        <div class="tl-dot" style="background:var(--amber);"></div>
+      </div>
+      <div class="tl-content">
+        <div class="tl-phase-label">
+          <span class="phase-badge pb-demo">🎤 Demo Prep</span>
+          <span class="tl-phase-title">Presentation, Slides & Rehearsal</span>
+        </div>
+        <ul class="tl-tasks">
+          <li class="tl-task">
+            <span class="tl-task-who who-all">ALL</span>
+            <span class="tl-task-text">Build the 5-minute slide deck (Google Slides or Canva). Sections: Problem (30 sec) → Solution (45 sec) → How Avalanche is used (45 sec) → Live demo (2 min) → Impact & next steps (1 min). Keep slides minimal — the demo is the main event.</span>
+          </li>
+          <li class="tl-task">
+            <span class="tl-task-who who-all">ALL</span>
+            <span class="tl-task-text">Rehearse the demo live at least twice. The demo script: (1) Open the app, show wallet connected. (2) Scan/show a QR code for "Household A". (3) Submit a deposit from the Verifier Panel. (4) Switch to Citizen tab — show balance going up live. (5) Show leaderboard reordering. (6) Click Snowtrace link to show the on-chain transaction. Time it — must fit in 2 minutes.</span>
+          </li>
+          <li class="tl-task">
+            <span class="tl-task-who who-all">ALL</span>
+            <span class="tl-task-text">Prepare a fallback plan: if internet is unstable during the live demo, have screenshots and a screen-recorded video of the working demo ready as backup. Also save the Snowtrace links to specific transactions in a browser bookmark for quick access.</span>
+          </li>
+          <li class="tl-task">
+            <span class="tl-task-who who-all">ALL</span>
+            <span class="tl-task-text">Top up all wallets via faucet one more time. Confirm the verifier wallet has enough AVAX to pay for 5–10 more transactions during the actual presentation. Testnet AVAX gas costs ~0.001 AVAX per tx — so 0.1 AVAX is more than enough.</span>
+          </li>
+        </ul>
+        <p class="tl-note">🎯 Exit criteria: Clean 5-minute run-through from slides to demo to close. Backup video ready. All wallets topped up. Team knows who speaks which section.</p>
+      </div>
+    </div>
+
+    <!-- PHASE 6 -->
+    <div class="tl-phase">
+      <div class="tl-time">
+        <div class="tl-time-text">Hour<br>10 – 11</div>
+        <div class="tl-dot" style="background:#c586c0;"></div>
+      </div>
+      <div class="tl-content">
+        <div class="tl-phase-label">
+          <span class="phase-badge pb-demo">💤 Buffer</span>
+          <span class="tl-phase-title">Contingency Time — Use Only If Needed</span>
+        </div>
+        <ul class="tl-tasks">
+          <li class="tl-task">
+            <span class="tl-task-who who-all">ALL</span>
+            <span class="tl-task-text">This hour is intentionally held in reserve. If everything is done early, use it to add one bonus feature: a simple "Redeem ECO" form that calls a placeholder function (it can just log to console — the point is showing judges the redemption pathway exists). Or spend it polishing the UI color theme and typography.</span>
+          </li>
+          <li class="tl-task">
+            <span class="tl-task-who who-all">ALL</span>
+            <span class="tl-task-text">If you're behind, use this time to finish integration and bugfixes — not to add new features. A working 4-feature app beats a buggy 6-feature app every single time in a hackathon.</span>
+          </li>
+        </ul>
+        <p class="tl-note">Final check: App is deployed and accessible via localhost (or deployed to Vercel in 5 min with <code>npm run build && vercel deploy</code>). Judges can access it on their own device if needed.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══ DEMO SCRIPT ══ -->
+  <div class="section-title-block">
+    <p class="section-eyebrow">// 06 · Presentation</p>
+    <h2 class="section-title">The 5-Minute Demo Script</h2>
+  </div>
+
+  <ul class="demo-steps">
+    <li class="demo-step">
+      <div class="demo-step-num">1</div>
+      <div class="demo-step-body">
+        <p class="demo-step-title">Open with the problem — make it local and real (30 sec)</p>
+        <p class="demo-step-desc">"Olongapo's Solid Waste Management plan has been stuck in national review because it's missing household-level compliance data. Every uncollected bag of mixed waste that ends up in a drainage canal makes flooding worse for families in Sta. Rita and Gordon Heights. SegrePay fixes this — and it pays people to do it."</p>
+      </div>
+    </li>
+    <li class="demo-step">
+      <div class="demo-step-num">2</div>
+      <div class="demo-step-body">
+        <p class="demo-step-title">Explain the system in one sentence (20 sec)</p>
+        <p class="demo-step-desc">"Residents bring sorted waste to the MRF. A trained EcoVerifier scans their household QR bag and logs the deposit on the Avalanche blockchain. The smart contract automatically sends ECO tokens to the household's wallet. Every transaction is public, permanent, and tamper-proof."</p>
+      </div>
+    </li>
+    <li class="demo-step">
+      <div class="demo-step-num">3</div>
+      <div class="demo-step-body">
+        <p class="demo-step-title">Show the QR code and explain its role (15 sec)</p>
+        <p class="demo-step-desc">Hold up the printed QR code card. "This is Household A's eco-bag tag — the QR encodes their wallet address. The MRF operator scans it to pre-fill the citizen address field. No app needed on the citizen side."</p>
+      </div>
+    </li>
+    <li class="demo-step">
+      <div class="demo-step-num">4</div>
+      <div class="demo-step-body">
+        <p class="demo-step-title">Live demo: submit a deposit on Avalanche (90 sec)</p>
+        <p class="demo-step-desc">Switch to the live app. "I'm now logged in as the EcoVerifier wallet." Fill in: Barangay 1, Recyclable, 3 kg, paste Household A's wallet address. Click Submit — MetaMask/Core pops up, confirm. "The transaction is being confirmed on Avalanche — 2-second finality." Switch to the Citizen tab. "Household A's balance just went from X to Y ECO — live, on-chain." Switch to the Leaderboard. "Barangay 1 just moved up. Every deposit, every barangay, every token — permanently recorded on the blockchain." Click the Snowtrace link. "This is the on-chain proof — the <code>DepositLogged</code> event, timestamped, with the barangay, waste category, kg, and ECO minted. Immutable."</p>
+      </div>
+    </li>
+    <li class="demo-step">
+      <div class="demo-step-num">5</div>
+      <div class="demo-step-body">
+        <p class="demo-step-title">Close with impact and scalability (45 sec)</p>
+        <p class="demo-step-desc">"This on-chain ledger is exactly the compliance data Olongapo's SWM plan needs to get national approval. ECO tokens become exchangeable for city fee discounts or partner rewards — building a circular local economy. And because this is on Avalanche, it can scale to any of the 352 cities in the Philippines with the same SWM data problem. SegrePay — where every bag of properly sorted waste becomes a block on the chain."</p>
+      </div>
+    </li>
+  </ul>
+
+  <!-- ══ RISK MITIGATION ══ -->
+  <div class="section-title-block">
+    <p class="section-eyebrow">// 07 · Risk Register</p>
+    <h2 class="section-title">What Could Go Wrong & How to Handle It</h2>
+  </div>
+
+  <table class="risk-table">
+    <thead>
+      <tr>
+        <th>Risk</th>
+        <th>Likelihood</th>
+        <th>Mitigation</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Fuji testnet is slow or congested during demo</strong></td>
+        <td><span class="tag-sm amber">Medium</span></td>
+        <td>Have 3 pre-confirmed transactions bookmarked on Snowtrace as backup. If live tx is slow, show the bookmark and say "here's a previous transaction from our testing — same output." Video backup also works.</td>
+      </tr>
+      <tr>
+        <td><strong>Core Wallet / MetaMask fails to pop up during demo</strong></td>
+        <td><span class="tag-sm amber">Medium</span></td>
+        <td>Test on the exact demo laptop 30 min before presentation. Have a second laptop ready with wallets pre-configured. Refresh the page if the extension freezes — it usually recovers.</td>
+      </tr>
+      <tr>
+        <td><strong>Faucet rate limit — wallets run out of testnet AVAX</strong></td>
+        <td><span class="tag-sm green">Low</span></td>
+        <td>Request faucet AVAX at the start of the hackathon and again at Hour 8. 0.5 AVAX per wallet is sufficient for 50+ transactions. Keep 3 backup wallets ready with AVAX.</td>
+      </tr>
+      <tr>
+        <td><strong>Smart contract bug discovered during integration</strong></td>
+        <td><span class="tag-sm amber">Medium</span></td>
+        <td>Redeploy is fast (under 5 min on Remix). Don't spend more than 20 minutes debugging — redeploy with a fix. Keep the old contract address noted in case the new deploy has issues.</td>
+      </tr>
+      <tr>
+        <td><strong>Frontend Ethers.js connection breaks in build</strong></td>
+        <td><span class="tag-sm green">Low</span></td>
+        <td>Run the demo from the Vite dev server (<code>npm run dev</code>), not a production build. Avoids most build-time issues. If deploying to Vercel, test the deployed URL immediately after pushing.</td>
+      </tr>
+      <tr>
+        <td><strong>Team member falls behind, blocking the critical path</strong></td>
+        <td><span class="tag-sm red">High if unmanaged</span></td>
+        <td>Project lead checks in every 90 minutes. If FE is blocked on contract integration, BC team drops everything and pair-programs with them. The leaderboard is the lowest-priority feature — cut it last if time is short. The core demo only needs the deposit form + citizen balance.</td>
+      </tr>
+    </tbody>
+  </table>
+
+</div><!-- /main -->
+
+<div class="doc-footer">
+  <div class="footer-brand">SegrePay — Build Roadmap</div>
+  <div class="footer-mono">TECHFEST Hackathon · Olongapo City, Zambales · Avalanche Fuji Testnet</div>
+</div>
+
+</body>
+</html>
