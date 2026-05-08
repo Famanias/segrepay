@@ -27,14 +27,27 @@ import {
   USE_MOCK_DATA,
 } from '@/contracts/abis';
 import type {
-  SegreTokenContract,
-  SegRewardsContract,
   WasteDeposit,
   BarangayRanking,
   WasteCategory,
-  ContractConfig,
   TransactionResult,
 } from '@/types';
+
+// ============================================================================
+// FALLBACK MOCK MODE
+// ============================================================================
+
+// Auto-detect if we should use mock data (contracts not deployed or env flag set)
+let _forceMockMode = USE_MOCK_DATA;
+let _contractsInitialized = false;
+
+export function isMockMode(): boolean {
+  return _forceMockMode || !_contractsInitialized;
+}
+
+export function setMockMode(enabled: boolean): void {
+  _forceMockMode = enabled;
+}
 
 // ============================================================================
 // MOCK DATA FOR DEVELOPMENT/DEMO
@@ -85,27 +98,46 @@ let signer: JsonRpcSigner | null = null;
  * Call this after wallet connection
  */
 export function initializeContracts(browserProvider: BrowserProvider, userSigner: JsonRpcSigner): void {
-  provider = browserProvider;
-  signer = userSigner;
+  try {
+    provider = browserProvider;
+    signer = userSigner;
 
-  segreTokenContract = new Contract(
-    CONTRACT_ADDRESSES.SEGRE_TOKEN,
-    SEGRE_TOKEN_ABI,
-    signer
-  );
+    // Validate contract addresses (not zero address)
+    const isValidAddress = (addr: string) => addr && addr.startsWith('0x') && addr !== '0x0000000000000000000000000000000000000000';
+    
+    if (!isValidAddress(CONTRACT_ADDRESSES.SEGRE_TOKEN) || !isValidAddress(CONTRACT_ADDRESSES.SEG_REWARDS)) {
+      console.warn('[Contracts] Invalid contract addresses, using mock mode');
+      _contractsInitialized = false;
+      _forceMockMode = true;
+      return;
+    }
 
-  segRewardsContract = new Contract(
-    CONTRACT_ADDRESSES.SEG_REWARDS,
-    SEG_REWARDS_ABI,
-    signer
-  );
+    segreTokenContract = new Contract(
+      CONTRACT_ADDRESSES.SEGRE_TOKEN,
+      SEGRE_TOKEN_ABI,
+      signer
+    );
+
+    segRewardsContract = new Contract(
+      CONTRACT_ADDRESSES.SEG_REWARDS,
+      SEG_REWARDS_ABI,
+      signer
+    );
+    
+    _contractsInitialized = true;
+    console.log('[Contracts] Initialized successfully');
+  } catch (error) {
+    console.error('[Contracts] Initialization failed:', error);
+    _contractsInitialized = false;
+    _forceMockMode = true;
+  }
 }
 
 /**
  * Get contract instances (throws if not initialized)
  */
 function getContracts(): { segreToken: Contract; segRewards: Contract } {
-  if (USE_MOCK_DATA) {
+  if (isMockMode()) {
     throw new Error('Using mock data mode - no contract interactions needed');
   }
   if (!segreTokenContract || !segRewardsContract) {
@@ -123,8 +155,10 @@ function getContracts(): { segreToken: Contract; segRewards: Contract } {
  * Get ECO token balance for a specific address
  */
 export async function getTokenBalance(address: string): Promise<bigint> {
-  if (USE_MOCK_DATA) {
-    return BigInt(500) * BigInt(10 ** 18); // 500 ECO
+  if (isMockMode()) {
+    // Generate consistent mock balance based on address
+    const mockBalance = BigInt(parseInt(address.slice(-4), 16) % 1000) * BigInt(10 ** 18);
+    return mockBalance || BigInt(500) * BigInt(10 ** 18);
   }
   const { segreToken } = getContracts();
   const balance = await segreToken.balanceOf(address);
@@ -136,7 +170,7 @@ export async function getTokenBalance(address: string): Promise<bigint> {
  * Get token decimals (for formatting)
  */
 export async function getTokenDecimals(): Promise<number> {
-  if (USE_MOCK_DATA) return 18;
+  if (isMockMode()) return 18;
   const { segreToken } = getContracts();
   return await segreToken.decimals();
 }
@@ -146,7 +180,7 @@ export async function getTokenDecimals(): Promise<number> {
  * Get token symbol (ECO)
  */
 export async function getTokenSymbol(): Promise<string> {
-  if (USE_MOCK_DATA) return 'ECO';
+  if (isMockMode()) return 'ECO';
   const { segreToken } = getContracts();
   return await segreToken.symbol();
 }
@@ -156,7 +190,7 @@ export async function getTokenSymbol(): Promise<string> {
  * Get full token information
  */
 export async function getTokenInfo(): Promise<{ symbol: string; decimals: number; name: string }> {
-  if (USE_MOCK_DATA) {
+  if (isMockMode()) {
     return { symbol: 'ECO', decimals: 18, name: 'SegrePay Token' };
   }
   const { segreToken } = getContracts();
@@ -190,7 +224,7 @@ export async function submitDeposit(
   wasteCategory: WasteCategory,
   kg: number
 ): Promise<TransactionResult> {
-  if (USE_MOCK_DATA) {
+  if (isMockMode()) {
     // Simulate successful transaction
     await new Promise((resolve) => setTimeout(resolve, 2000));
     return {
@@ -257,8 +291,22 @@ export async function getCitizenDeposits(
   citizenAddress: string,
   fromBlock: number = -1000
 ): Promise<WasteDeposit[]> {
-  if (USE_MOCK_DATA) {
-    return MOCK_DEPOSITS.filter((d) => d.citizen.toLowerCase() === citizenAddress.toLowerCase());
+  if (isMockMode()) {
+    // Generate personalized mock deposits for any address
+    const numDeposits = (parseInt(citizenAddress.slice(-2), 16) % 5) + 1;
+    const categories: WasteCategory[] = ['recyclable', 'biodegradable', 'residual'];
+    
+    return Array.from({ length: numDeposits }, (_, i) => ({
+      id: `mock-${citizenAddress.slice(-6)}-${i}`,
+      citizen: citizenAddress,
+      barangayId: (parseInt(citizenAddress.slice(-4), 16) % 17) + 1,
+      barangayName: `Barangay ${(parseInt(citizenAddress.slice(-4), 16) % 17) + 1}`,
+      wasteCategory: categories[i % 3],
+      kg: (parseInt(citizenAddress.slice(-2), 16) % 10) + 1 + i,
+      ecoMinted: BigInt(((parseInt(citizenAddress.slice(-2), 16) % 10) + 1 + i) * 10) * BigInt(10 ** 18),
+      timestamp: Date.now() - (i * 86400000), // Each deposit 1 day apart
+      txHash: `0x${citizenAddress.slice(2, 8)}${i.toString(16).padStart(2, '0')}...`,
+    }));
   }
 
   try {
@@ -298,8 +346,11 @@ export async function getCitizenDeposits(
  * Get total kg deposited by a citizen
  */
 export async function getTotalKgDeposited(address: string): Promise<bigint> {
-  if (USE_MOCK_DATA) {
-    return BigInt(25); // 25 kg mock
+  if (isMockMode()) {
+    // Calculate from mock deposits
+    const numDeposits = (parseInt(address.slice(-2), 16) % 5) + 1;
+    const baseKg = (parseInt(address.slice(-2), 16) % 10) + 1;
+    return BigInt(numDeposits * baseKg + 10);
   }
   const { segRewards } = getContracts();
   const total = await segRewards.totalKgDeposited(address);
@@ -318,8 +369,31 @@ export async function getTotalKgDeposited(address: string): Promise<bigint> {
  * - ids: number[] (array of barangay IDs)
  */
 export async function getBarangayTotals(ids: number[]): Promise<BarangayRanking[]> {
-  if (USE_MOCK_DATA) {
-    return MOCK_BARANGAYS.filter((b) => ids.includes(b.id));
+  if (isMockMode()) {
+    // Generate realistic mock rankings for all 17 barangays
+    const barangayNames = [
+      'East Bajac-bajac', 'West Bajac-bajac', 'New Kababae', 'Old Cabalan',
+      'New Cabalan', 'New Ilalim', 'Old Ilalim', 'Sta. Rita',
+      'East Bajac-bajac', 'West Tapinac', 'East Tapinac', 'Gordon Heights',
+      'Mabayuan', 'Kalaklan', 'Asinan', 'Banicain', 'West Bajac-bajac'
+    ];
+    
+    const allBarangays: BarangayRanking[] = ids.map((id) => {
+      const baseEco = 10000 - (id * 500) + (parseInt(String(id * 123), 10) % 2000);
+      return {
+        id,
+        name: `Barangay ${id} (${barangayNames[id - 1] || 'Olongapo'})`,
+        totalEco: BigInt(baseEco) * BigInt(10 ** 18),
+        totalKg: Math.floor(baseEco / 10),
+        rank: 0, // Will be calculated after sorting
+      };
+    });
+    
+    // Sort by totalEco and assign ranks
+    allBarangays.sort((a, b) => (b.totalEco > a.totalEco ? 1 : -1));
+    allBarangays.forEach((b, i) => (b.rank = i + 1));
+    
+    return allBarangays;
   }
 
   try {
@@ -351,9 +425,9 @@ export async function getBarangayTotals(ids: number[]): Promise<BarangayRanking[
  * Get ECO total for a single barangay
  */
 export async function getBarangayTotal(id: number): Promise<bigint> {
-  if (USE_MOCK_DATA) {
-    const barangay = MOCK_BARANGAYS.find((b) => b.id === id);
-    return barangay?.totalEco || BigInt(0);
+  if (isMockMode()) {
+    const baseEco = 10000 - (id * 500) + (parseInt(String(id * 123), 10) % 2000);
+    return BigInt(baseEco) * BigInt(10 ** 18);
   }
   const { segRewards } = getContracts();
   const total = await segRewards.barangayTotal(id);
@@ -382,7 +456,7 @@ export function subscribeToDeposits(
   callback: (deposit: WasteDeposit) => void,
   fromBlock: number = -100
 ): () => void {
-  if (USE_MOCK_DATA) {
+  if (isMockMode()) {
     // Simulate events every 30 seconds
     const interval = setInterval(() => {
       const mockDeposit: WasteDeposit = {
@@ -443,8 +517,20 @@ export function subscribeToDeposits(
  * Get recent deposits (last 50 blocks or 24 hours)
  */
 export async function getRecentDeposits(blockCount: number = 50): Promise<WasteDeposit[]> {
-  if (USE_MOCK_DATA) {
-    return MOCK_DEPOSITS;
+  if (isMockMode()) {
+    // Generate varied mock deposits
+    const categories: WasteCategory[] = ['recyclable', 'biodegradable', 'residual'];
+    return Array.from({ length: 10 }, (_, i) => ({
+      id: `recent-${Date.now()}-${i}`,
+      citizen: `0x${(i + 1).toString(16).padStart(4, '0')}...${(i * 123).toString(16).slice(0, 6)}`,
+      barangayId: (i % 17) + 1,
+      barangayName: `Barangay ${(i % 17) + 1}`,
+      wasteCategory: categories[i % 3],
+      kg: (i % 10) + 1,
+      ecoMinted: BigInt(((i % 10) + 1) * 10) * BigInt(10 ** 18),
+      timestamp: Date.now() - (i * 3600000), // Each 1 hour apart
+      txHash: `0x${Date.now().toString(16).slice(-8)}${i.toString(16).padStart(2, '0')}...`,
+    }));
   }
 
   try {
@@ -487,9 +573,10 @@ export async function getRecentDeposits(blockCount: number = 50): Promise<WasteD
  * Check if an address is an authorized verifier
  */
 export async function isVerifier(address: string): Promise<boolean> {
-  if (USE_MOCK_DATA) {
-    // For demo, first address is verifier
-    return address.toLowerCase().endsWith('1') || address.toLowerCase().endsWith('a');
+  if (isMockMode()) {
+    // Demo mode: addresses ending in '1', 'a', or 'v' are verifiers
+    const lastChar = address.slice(-1).toLowerCase();
+    return ['1', 'a', 'v', 'f'].includes(lastChar);
   }
   const { segRewards } = getContracts();
   return await segRewards.isVerifier(address);
@@ -500,12 +587,130 @@ export async function isVerifier(address: string): Promise<boolean> {
  * Get current reward rate
  */
 export async function getTokensPerKg(): Promise<bigint> {
-  if (USE_MOCK_DATA) {
-    return BigInt(10) * BigInt(10 ** 18); // 10 ECO per kg
+  if (isMockMode()) {
+    return BigInt(10) * BigInt(10 ** 18); // 10 ECO per kg for MRF
   }
   const { segRewards } = getContracts();
   const rate = await segRewards.tokensPerKg();
   return BigInt(rate.toString());
+}
+
+/**
+ * POST /ecosnap
+ * Submit an EcoSnap photo for AI verification
+ * EcoSnap earns 7 ECO/kg (vs 10 ECO/kg at physical MRF)
+ * 
+ * Request body:
+ * {
+ *   citizen: string (address),
+ *   wasteCategory: 'biodegradable' | 'recyclable' | 'residual' | 'hazardous',
+ *   kg: number,
+ *   imageUrl: string (base64 image data)
+ * }
+ * 
+ * EcoSnap Reward Rate: 7 ECO per kg
+ * MRF Reward Rate: 10 ECO per kg
+ */
+export async function submitEcoSnap(
+  citizen: string,
+  wasteCategory: WasteCategory,
+  kg: number,
+  imageUrl: string
+): Promise<TransactionResult & { ecoEarned?: bigint }> {
+  // Validate inputs
+  if (!ethers.isAddress(citizen)) {
+    return { success: false, error: 'Invalid citizen wallet address' };
+  }
+  if (kg <= 0 || kg > 50) {
+    return { success: false, error: 'Weight must be between 0.1 and 50 kg' };
+  }
+  if (!imageUrl || imageUrl.length < 100) {
+    return { success: false, error: 'Invalid image data' };
+  }
+
+  const ecoSnapRate = 7; // 7 ECO per kg for EcoSnap
+  const ecoEarned = BigInt(kg * ecoSnapRate) * BigInt(10 ** 18);
+
+  if (isMockMode()) {
+    // Simulate API processing delay
+    await new Promise((resolve) => setTimeout(resolve, 2000 + Math.random() * 2000));
+    
+    // 5% chance of rejection for demo purposes
+    if (Math.random() < 0.05) {
+      return { 
+        success: false, 
+        error: 'AI verification failed. Please ensure waste is clearly visible and properly segregated.' 
+      };
+    }
+
+    // Simulate successful EcoSnap submission
+    const mockTxHash = '0x' + Array.from({ length: 64 }, () => 
+      Math.floor(Math.random() * 16).toString(16)
+    ).join('');
+
+    return {
+      success: true,
+      hash: mockTxHash,
+      ecoEarned,
+    };
+  }
+
+  try {
+    // In production, this would:
+    // 1. Upload image to decentralized storage (IPFS)
+    // 2. Call AI service for verification
+    // 3. If approved, mint ECO tokens via smart contract
+    
+    const { segRewards } = getContracts();
+    
+    // For now, simulate the contract call
+    // In production, this might be a separate EcoSnap contract or modified rewardDeposit
+    const tx = await segRewards.rewardDeposit(
+      citizen,
+      0, // Barangay 0 indicates EcoSnap submission
+      wasteCategory,
+      kg
+    );
+
+    const receipt = await tx.wait();
+
+    return {
+      success: true,
+      hash: tx.hash,
+      receipt,
+      ecoEarned,
+    };
+  } catch (error: any) {
+    console.error('EcoSnap submission error:', error);
+    
+    let errorMessage = error.message || 'EcoSnap submission failed';
+    if (errorMessage.includes('user rejected')) {
+      errorMessage = 'Transaction rejected by user';
+    } else if (errorMessage.includes('AI verification')) {
+      errorMessage = 'AI could not verify the image. Please try again with clearer photo.';
+    }
+
+    return {
+      success: false,
+      error: errorMessage,
+    };
+  }
+}
+
+/**
+ * GET /ecosnap/rate
+ * Get EcoSnap reward rate (7 ECO/kg)
+ */
+export function getEcoSnapRate(): number {
+  return 7; // 7 ECO per kg for EcoSnap
+}
+
+/**
+ * GET /mrf/rate
+ * Get MRF reward rate (10 ECO/kg)
+ */
+export function getMrfRate(): number {
+  return 10; // 10 ECO per kg for physical MRF deposits
 }
 
 // ============================================================================

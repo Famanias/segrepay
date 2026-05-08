@@ -8,6 +8,7 @@ import { Layout } from '@/components/Layout';
 import { VerifierPanel } from '@/pages/VerifierPanel';
 import { CitizenDashboard } from '@/pages/CitizenDashboard';
 import { Leaderboard } from '@/pages/Leaderboard';
+import { EcoSnap } from '@/pages/EcoSnap';
 import { useAppStore } from '@/stores/appStore';
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
     <Layout>
       {activeTab === 'verifier' && <VerifierPanel />}
       {activeTab === 'citizen' && <CitizenDashboard />}
+      {activeTab === 'ecosnap' && <EcoSnap />}
       {activeTab === 'leaderboard' && <Leaderboard />}
     </Layout>
   );

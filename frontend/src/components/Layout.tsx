@@ -21,6 +21,7 @@ export function Layout({ children }: LayoutProps) {
   // Determine available tabs based on user role
   const tabs = [
     { id: 'citizen' as const, label: 'Citizen View', icon: '👤' },
+    { id: 'ecosnap' as const, label: 'EcoSnap', icon: '📸' },
     { id: 'leaderboard' as const, label: 'Leaderboard', icon: '🏆' },
     ...(isVerifier ? [{ id: 'verifier' as const, label: 'Verifier Panel', icon: '✓' }] : []),
   ];

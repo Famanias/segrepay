@@ -17,6 +17,7 @@ import {
   getCitizenDeposits,
   formatTokenAmount,
   getSnowtraceAddressUrl,
+  isMockMode,
 } from '@/services/contracts';
 import type { WasteDeposit } from '@/types';
 import { LoadingSpinner } from '@/components/Layout';
@@ -59,7 +60,12 @@ export function CitizenDashboard() {
         });
       } catch (error) {
         console.error('Failed to fetch citizen stats:', error);
-        showError('Data Load Failed', 'Could not fetch your balance and deposits');
+        // Only show error if not in mock mode (mock mode always works)
+        if (!isMockMode()) {
+          showError('Data Load Failed', 'Could not fetch your balance from blockchain. Switching to demo mode...');
+          // Auto-enable mock mode on failure
+          setTimeout(() => window.location.reload(), 2000);
+        }
         setStats((prev) => ({ ...prev, isLoading: false }));
       }
     };
@@ -96,8 +102,17 @@ export function CitizenDashboard() {
     <div className="max-w-4xl mx-auto">
       {/* Header */}
       <div className="mb-8">
-        <p className="eyebrow">Citizen View</p>
-        <h2 className="section-title">Your Dashboard</h2>
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="eyebrow">Citizen View</p>
+            <h2 className="section-title">Your Dashboard</h2>
+          </div>
+          {isMockMode() && (
+            <span className="badge-yellow text-xs">
+              🧪 Demo Mode
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Stats Cards */}

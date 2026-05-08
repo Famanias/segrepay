@@ -52,4 +52,8 @@
   .badge-blue {
     @apply inline-flex items-center px-2.5 py-0.5 rounded text-xs font-mono font-medium bg-segre-blue-bg text-segre-blue;
   }
+  
+  .badge-yellow {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded text-xs font-mono font-medium bg-yellow-100 text-yellow-700 border border-yellow-300;
+  }
 }

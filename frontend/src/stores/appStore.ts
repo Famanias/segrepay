@@ -8,7 +8,7 @@ import type { Notification, WasteDeposit, BarangayRanking } from '@/types';
 
 interface AppStore {
   // UI State
-  activeTab: 'verifier' | 'citizen' | 'leaderboard';
+  activeTab: 'verifier' | 'citizen' | 'ecosnap' | 'leaderboard';
   isQrModalOpen: boolean;
   selectedHouseholdId: string | null;
   
@@ -20,7 +20,7 @@ interface AppStore {
   notifications: Notification[];
   
   // Actions
-  setActiveTab: (tab: 'verifier' | 'citizen' | 'leaderboard') => void;
+  setActiveTab: (tab: 'verifier' | 'citizen' | 'ecosnap' | 'leaderboard') => void;
   openQrModal: (householdId: string) => void;
   closeQrModal: () => void;
   
