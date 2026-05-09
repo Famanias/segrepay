@@ -5,6 +5,13 @@
 
 import { create } from 'zustand';
 import type { Notification, WasteDeposit, BarangayRanking } from '@/types';
+import { 
+  isSupabaseConfigured, 
+  subscribeToLeaderboardChanges, 
+  subscribeToNewDeposits,
+  getLeaderboardFromDB,
+  getRecentDepositsFromDB 
+} from '@/services/supabase';
 
 interface AppStore {
   // UI State
@@ -23,6 +30,11 @@ interface AppStore {
   setActiveTab: (tab: 'verifier' | 'citizen' | 'ecosnap' | 'leaderboard') => void;
   openQrModal: (householdId: string) => void;
   closeQrModal: () => void;
+  
+  // Supabase Actions
+  initRealtimeSync: () => void;
+  unsubscribeRealtime: () => void;
+  loadInitialData: () => Promise<void>;
   
   // Data Actions
   setRecentDeposits: (deposits: WasteDeposit[]) => void;
@@ -58,6 +70,60 @@ export const useAppStore = create<AppStore>((set, get) => ({
 
   // Tab Navigation
   setActiveTab: (tab) => set({ activeTab: tab }),
+
+  // Supabase Real-time Sync
+  initRealtimeSync: () => {
+    if (!isSupabaseConfigured()) {
+      console.log('[AppStore] Supabase not configured, skipping realtime sync');
+      return;
+    }
+
+    // Subscribe to leaderboard changes
+    const unsubscribeLeaderboard = subscribeToLeaderboardChanges((leaderboard) => {
+      set({ leaderboard });
+    });
+
+    // Subscribe to new deposits
+    const unsubscribeDeposits = subscribeToNewDeposits((deposit) => {
+      const { recentDeposits } = get();
+      // Add new deposit to top of list, keep max 50
+      set({ 
+        recentDeposits: [deposit, ...recentDeposits].slice(0, 50) 
+      });
+    });
+
+    // Store unsubscribe functions for cleanup
+    set({ 
+      _unsubscribeLeaderboard: unsubscribeLeaderboard,
+      _unsubscribeDeposits: unsubscribeDeposits 
+    } as any);
+  },
+
+  unsubscribeRealtime: () => {
+    const state = get();
+    (state as any)._unsubscribeLeaderboard?.();
+    (state as any)._unsubscribeDeposits?.();
+  },
+
+  loadInitialData: async () => {
+    if (!isSupabaseConfigured()) {
+      return;
+    }
+
+    try {
+      // Load leaderboard
+      const leaderboard = await getLeaderboardFromDB();
+      set({ leaderboard });
+
+      // Load recent deposits
+      const recentDeposits = await getRecentDepositsFromDB(20);
+      set({ recentDeposits });
+
+      console.log('[AppStore] Initial data loaded from Supabase');
+    } catch (error) {
+      console.error('[AppStore] Failed to load initial data:', error);
+    }
+  },
 
   // QR Modal
   openQrModal: (householdId) => set({ 
